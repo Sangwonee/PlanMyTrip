@@ -2,11 +2,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.schemas import PlanMyTripRequest, ResponseDto
 from app.tourapi import area_based_list2
 from app.ai import build_plan
 
 app = FastAPI(title="PlanMyTrip")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://plan-my-trip-bucket.s3-website.ap-northeast-2.amazonaws.com",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 AREA_CODE = {
     "서울": 1, "인천": 2, "대전": 3, "대구": 4, "광주": 5, "부산": 6, "울산": 7, "세종": 8,
@@ -23,15 +37,14 @@ TYPE_TO_CONTENTTYPEID = {
 
 def _pick_area_code(destination: str) -> int:
     dest = (destination or "").strip()
-    return AREA_CODE.get(dest, 6)  # 기본값 부산(원하면 1=서울로 바꿔도 됨)
+    return AREA_CODE.get(dest, 6)  # 기본 부산
 
 def _pick_content_type_ids(travel_types):
     ids = []
-    for t in travel_types or []:
+    for t in (travel_types or []):
         if t in TYPE_TO_CONTENTTYPEID:
             ids.append(TYPE_TO_CONTENTTYPEID[t])
-    # 선택 없으면 None(전체)
-    return ids
+    return ids  # 없으면 []
 
 def _dedup(places):
     seen = set()
@@ -62,7 +75,7 @@ def plan(req: PlanMyTripRequest):
 
         places = []
 
-        # 1) 타입 선택이 있으면 타입별로 여러 번 호출해서 합치기
+        # 1) 타입 선택이 있으면 타입별 호출 후 합치기
         if ctype_ids:
             for ctid in ctype_ids:
                 places.extend(area_based_list2(area_code=area_code, content_type_id=ctid, num_of_rows=25))
