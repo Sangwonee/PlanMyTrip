@@ -1,123 +1,176 @@
+import os
 import json
-from datetime import datetime
-from typing import List
+import re
+from datetime import datetime, timedelta
+from typing import List, Union, Tuple
+
 from openai import OpenAI
-from app.schemas import PlanMyTripRequest, ResponseDto, PlaceCandidate
 
-client = OpenAI()
+from app.schemas import PlaceCandidate, ResponseDto
 
-SYSTEM = """
-너는 PlanMyTrip 여행 플래너다.
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
-규칙:
-- 반드시 "JSON만" 출력한다. (마크다운/설명/일반 문장 금지)
-- 출력은 아래 ResponseDto 형태를 정확히 따른다:
-{
-  "text": string,
-  "travelSchedule": [
-    {
-      "day": string,
-      "date": string,
-      "plan": [
-        {
-          "order": number,
-          "place": string,
-          "description": string,
-          "activity": string,
-          "address": string,
-          "image": string,
-          "latitude": number,
-          "longitude": number
-        }
-      ]
-    }
-  ]
-}
-- place/address/image/latitude/longitude는 제공된 후보 목록에서만 사용한다. (새 장소 생성 금지)
-- 일정은 여유롭게 구성한다. (Day당 4~6개)
-""".strip()
 
-def _dates_between(start: str, end: str) -> List[str]:
-    if not start and not end:
-        return [""]
-    if start and not end:
+def _normalize_date_str(s: str) -> str:
+    # "2025. 12. 09" -> "2025-12-09"
+    s = (s or "").strip()
+    s = s.replace(".", "-")
+    s = re.sub(r"\s+", "", s)
+    s = re.sub(r"-{2,}", "-", s)
+    return s
+
+
+def _parse_date_range(date_str: str) -> Tuple[str, str]:
+    s = _normalize_date_str(date_str)
+    if not s:
+        return "", ""
+    if "~" in s:
+        a, b = s.split("~", 1)
+        return a.strip(), b.strip()
+    return s.strip(), ""
+
+
+def _date_list(start: str, end: str) -> List[str]:
+    if not start:
+        return []
+    try:
+        s = datetime.strptime(start, "%Y-%m-%d")
+    except ValueError:
+        return []
+    if not end:
         return [start]
-    if end and not start:
-        return [end]
-
-    s = datetime.strptime(start, "%Y-%m-%d")
-    e = datetime.strptime(end, "%Y-%m-%d")
+    try:
+        e = datetime.strptime(end, "%Y-%m-%d")
+    except ValueError:
+        return [start]
     if e < s:
-        s, e = e, s
-
-    out = []
+        return [start]
+    days = []
     cur = s
-    while cur <= e:
-        out.append(cur.strftime("%Y-%m-%d"))
-        cur = cur.fromordinal(cur.toordinal() + 1)
-    return out
+    while cur <= e and len(days) < 10:
+        days.append(cur.strftime("%Y-%m-%d"))
+        cur += timedelta(days=1)
+    return days
 
-def build_plan(req: PlanMyTripRequest, places: List[PlaceCandidate]) -> ResponseDto:
-    dates = _dates_between(req.start_date, req.end_date)
 
-    # 모델에게 줄 후보(비용/길이 제한)
-    places_payload = [
-        {
-            "title": p.title,
-            "addr1": p.addr1,
-            "firstimage": p.firstimage,
-            "mapy": p.mapy,
-            "mapx": p.mapx,
-        }
-        for p in places[:30]
-    ]
+def build_plan_from_front(
+    *,
+    user_input: str,
+    date_str: str,
+    region: str,
+    travel_type: Union[str, List[str]],
+    transportation: str,
+    places: List[PlaceCandidate],
+) -> ResponseDto:
+    if not os.getenv("OPENAI_API_KEY"):
+        raise RuntimeError("OPENAI_API_KEY is not set")
 
-    prompt = f"""
-[여행 조건]
-- 기간: {req.start_date} ~ {req.end_date}
-- 여행지: {req.destination}
-- 유형: {", ".join(req.travel_types) if req.travel_types else "미선택"}
-- 이동수단: {req.transportation}
-- 추가요청: {req.user_input}
+    start_date, end_date = _parse_date_range(date_str)
+    dates = _date_list(start_date, end_date)
 
-[장소 후보(JSON) - 이 목록에서만 선택]
-{json.dumps(places_payload, ensure_ascii=False)}
+    # travelType 표준화(프롬프트용)
+    if isinstance(travel_type, list):
+        travel_types = [str(x).strip() for x in travel_type if str(x).strip()]
+    else:
+        travel_types = [x.strip() for x in str(travel_type or "").split(",") if x.strip()]
 
-요청:
-- travelSchedule는 {len(dates)}일치로 구성해.
-- 각 day의 plan은 order를 1부터 증가시키고, 4~6개로 여유롭게.
-- plan의 place는 title, address는 addr1, image는 firstimage,
-  latitude는 mapy, longitude는 mapx를 그대로 넣어.
-- 최종 출력은 JSON만.
-""".strip()
+    # 후보 장소 payload (모델은 이 중에서만 선택하게)
+    candidates = []
+    for p in places[:60]:
+        candidates.append(
+            {
+                "title": p.title,
+                "address": p.addr1,
+                "image": p.firstimage,
+                "latitude": p.mapy,
+                "longitude": p.mapx,
+            }
+        )
+
+    system = (
+        "너는 감성 힐링 여행 플래너다.\n"
+        "반드시 입력 받은 지역(region)과 날짜(date_range)를 지켜서 일정을 만든다.\n"
+        "반드시 candidates 목록 안의 title만 장소로 사용한다(목록 밖 장소 금지).\n"
+        "반환은 오직 JSON만 출력한다(설명 문장/마크다운 금지).\n"
+        "JSON 스키마는 response_schema를 따른다.\n"
+    )
+
+    response_schema = {
+        "text": "string",
+        "travelSchedule": [
+            {
+                "day": "Day 1",
+                "date": "YYYY-MM-DD",
+                "plan": [
+                    {
+                        "order": 1,
+                        "place": "string (must match candidates.title)",
+                        "description": "string",
+                        "activity": "string",
+                        "address": "string",
+                        "image": "string",
+                        "latitude": 0.0,
+                        "longitude": 0.0,
+                    }
+                ],
+            }
+        ],
+    }
+
+    user_payload = {
+        "region": region,
+        "date_range": {"start": start_date, "end": end_date},
+        "travelTypes": travel_types,
+        "transportation": transportation,
+        "userInput": user_input,
+        "candidates": candidates,
+        "response_schema": response_schema,
+        "rules": [
+            "place는 candidates.title 중 하나여야 함",
+            "latitude/longitude는 해당 후보의 좌표를 그대로 사용",
+            "1박 이상이면 숙소 1개 포함",
+            "일정은 너무 빡빡하지 않게",
+        ],
+        "date_hint_list": dates,
+    }
 
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": prompt},
-        ],
         temperature=0.4,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+        ],
     )
 
-    content = resp.choices[0].message.content or ""
-
-    # 혹시 코드블록으로 감싸서 줄 수도 있어서 제거
-    content = content.strip()
-    if content.startswith("```"):
-        content = content.strip("`")
-        # "json\n{...}" 형태 제거
-        if content.lower().startswith("json"):
-            content = content[4:].strip()
-
+    content = resp.choices[0].message.content or "{}"
     data = json.loads(content)
 
-    # date/day 보정(모델이 비워둘 수 있음)
-    if isinstance(data.get("travelSchedule"), list):
+    # ✅ 장소명 기반으로 좌표/주소/이미지 보정(모델 실수 방지)
+    place_map = {p.title: p for p in places}
+    for day in data.get("travelSchedule", []):
+        # 날짜 강제 보정(날짜 리스트가 있으면 그걸로)
+        # day 순서대로 date_hint_list 적용
+        # (모델이 2023 같은 거 써도 덮어씀)
+        pass
+
+    # 날짜 덮어쓰기(모델이 이상한 연도 쓰는 걸 방지)
+    if dates and isinstance(data.get("travelSchedule"), list):
         for i, d in enumerate(data["travelSchedule"]):
-            if isinstance(d, dict):
-                d.setdefault("day", f"Day {i+1}")
-                if not d.get("date") and i < len(dates):
-                    d["date"] = dates[i]
+            if isinstance(d, dict) and i < len(dates):
+                d["day"] = d.get("day") or f"Day {i+1}"
+                d["date"] = dates[i]
+
+    for d in data.get("travelSchedule", []):
+        for plan in d.get("plan", []):
+            title = plan.get("place", "")
+            cand = place_map.get(title)
+            if cand:
+                plan["latitude"] = float(cand.mapy or 0.0)
+                plan["longitude"] = float(cand.mapx or 0.0)
+                if not plan.get("address"):
+                    plan["address"] = cand.addr1 or ""
+                if not plan.get("image"):
+                    plan["image"] = cand.firstimage or ""
 
     return ResponseDto.model_validate(data)

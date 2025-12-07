@@ -1,12 +1,14 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.schemas import PlanMyTripRequest, ResponseDto
+from app.schemas import FrontPlanRequest, ResponseDto
 from app.tourapi import area_based_list2
-from app.ai import build_plan
+from app.ai import build_plan_from_front
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
 
 app = FastAPI(title="PlanMyTrip")
 
@@ -35,16 +37,21 @@ TYPE_TO_CONTENTTYPEID = {
     "음식점": 39,
 }
 
-def _pick_area_code(destination: str) -> int:
-    dest = (destination or "").strip()
-    return AREA_CODE.get(dest, 6)  # 기본 부산
 
-def _pick_content_type_ids(travel_types):
-    ids = []
-    for t in (travel_types or []):
-        if t in TYPE_TO_CONTENTTYPEID:
-            ids.append(TYPE_TO_CONTENTTYPEID[t])
-    return ids  # 없으면 []
+def _pick_area_code(region: str) -> int:
+    return AREA_CODE.get((region or "").strip(), 6)  # 기본 부산
+
+
+def _to_types(travelType) -> list[str]:
+    if isinstance(travelType, list):
+        return [str(x).strip() for x in travelType if str(x).strip()]
+    return [x.strip() for x in str(travelType or "").split(",") if x.strip()]
+
+
+def _pick_content_type_ids(travelType) -> list[int]:
+    types = _to_types(travelType)
+    return [TYPE_TO_CONTENTTYPEID[t] for t in types if t in TYPE_TO_CONTENTTYPEID]
+
 
 def _dedup(places):
     seen = set()
@@ -57,43 +64,42 @@ def _dedup(places):
         out.append(p)
     return out
 
+
 @app.get("/health")
 def health():
     return {"ok": True}
 
-@app.get("/v1/tourapi-test")
-def tourapi_test(area: str = "부산"):
-    area_code = _pick_area_code(area)
-    places = area_based_list2(area_code=area_code, num_of_rows=10)
-    return [p.model_dump() for p in places]
 
 @app.post("/v1/plan", response_model=ResponseDto)
-def plan(req: PlanMyTripRequest):
+def plan(req: FrontPlanRequest):
     try:
-        area_code = _pick_area_code(req.destination)
-        ctype_ids = _pick_content_type_ids(req.travel_types)
+        area_code = _pick_area_code(req.region)
+        ctype_ids = _pick_content_type_ids(req.travelType)
 
         places = []
-
-        # 1) 타입 선택이 있으면 타입별 호출 후 합치기
         if ctype_ids:
             for ctid in ctype_ids:
                 places.extend(area_based_list2(area_code=area_code, content_type_id=ctid, num_of_rows=25))
         else:
-            # 2) 타입 선택이 없으면 넓게 한 번
             places = area_based_list2(area_code=area_code, content_type_id=None, num_of_rows=50)
 
         places = _dedup(places)
 
-        # 후보가 너무 적으면 넓게 한번 더
+        # 후보가 너무 적으면 넓게 한 번 더
         if len(places) < 10:
             places = _dedup(places + area_based_list2(area_code=area_code, content_type_id=None, num_of_rows=80))
 
         if not places:
             return ResponseDto(text="TourAPI에서 좌표 있는 장소 후보를 찾지 못했어요.", travelSchedule=[])
 
-        # 3) OpenAI로 일정을 ResponseDto로 생성
-        return build_plan(req, places)
+        return build_plan_from_front(
+            user_input=req.userInput,
+            date_str=req.date,
+            region=req.region,
+            travel_type=req.travelType,
+            transportation=req.transportation,
+            places=places,
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
