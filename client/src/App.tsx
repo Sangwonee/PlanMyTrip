@@ -5,7 +5,6 @@ import { Sidebar } from "./components/Sidebar/Sidebar";
 import { ChatArea } from "./components/Chat/ChatArea";
 import { InputArea } from "./components/Chat/InputArea";
 import { SplitViewToggle } from "./components/SplitView/SplitViewToggle";
-import { useChatStore } from "./store/chatStore";
 import {
   AppContainer,
   SidebarWrapper,
@@ -16,15 +15,12 @@ import DaysMap from "./components/map/DaysMap";
 import { SplitView } from "./components/SplitView/SplitView";
 import { useSplitViewStore } from "./store/splitViewStore";
 import LandingPage from "./pages/LandingPage";
+import PlanFormPage from "./pages/PlanFormPage";
 
 const queryClient = new QueryClient();
 
 function ChatApp() {
-  const { currentChatId, chats } = useChatStore();
   const { showSplitView } = useSplitViewStore();
-
-  const currentChat = chats.find((chat) => chat.id === currentChatId);
-  const hasMessages = currentChat && currentChat.messages.length > 0;
 
   return (
     <>
@@ -38,7 +34,7 @@ function ChatApp() {
           <ChatContent>
             <ChatArea />
           </ChatContent>
-          {hasMessages && <InputArea />}
+          <InputArea />
         </ChatContainer>
 
         {showSplitView && (
@@ -60,6 +56,7 @@ export default function App() {
         <GlobalStyle />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/plan" element={<PlanFormPage />} />
           <Route path="/chat" element={<ChatApp />} />
         </Routes>
       </BrowserRouter>

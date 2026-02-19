@@ -31,6 +31,28 @@ const MenuItem = styled.button`
   }
 `;
 
+const NewPlanBtn = styled.button`
+  width: 100%;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--color-accent-bright), var(--color-accent));
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(74, 156, 93, 0.25);
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(74, 156, 93, 0.35);
+  }
+`;
+
 const SectionTitle = styled.div`
   font-size: 10px;
   font-weight: 600;
@@ -43,7 +65,6 @@ const SectionTitle = styled.div`
 import type React from "react";
 import { useChatStore } from "../../store/chatStore";
 import { HomeIcon } from "../Icons";
-import UserInfoForm from "../Chat/UserInfoForm";
 import { useUserPlanInfoStore } from "../../store/userPlanInfoStore";
 import { useTravelScheduleStore } from "../../store/travelScheduleStore";
 import { useNavigate } from "react-router-dom";
@@ -62,18 +83,25 @@ export const SidebarMenu: React.FC = () => {
     navigate("/");
   };
 
+  const handleNewPlan = () => {
+    navigate("/plan");
+  };
+
   return (
     <MenuContainer>
+      <NewPlanBtn onClick={handleNewPlan}>
+        ✦ 새 여행 계획
+      </NewPlanBtn>
+
+      <div style={{ margin: "4px 0" }} />
+
       <MenuItem onClick={handleHome}>
         <HomeIcon size={16} />
         홈으로
       </MenuItem>
 
       {chats.length > 0 && (
-        <>
-          <SectionTitle>여행 설정</SectionTitle>
-          <UserInfoForm isSmall />
-        </>
+        <SectionTitle>최근 여행</SectionTitle>
       )}
     </MenuContainer>
   );

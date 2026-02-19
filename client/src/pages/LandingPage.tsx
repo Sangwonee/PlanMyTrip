@@ -413,136 +413,136 @@ const FooterCopy = styled.p`
 
 /* ── 컴포넌트 ────────────────────────── */
 const FEATURES = [
-    {
-        icon: "🤖",
-        title: "AI 여행 플래너",
-        desc: "OpenAI GPT-4o가 여행 스타일, 날짜, 선호도를 분석해 최적의 맞춤 일정을 자동으로 생성해드립니다.",
-    },
-    {
-        icon: "🗺️",
-        title: "실제 장소 기반 추천",
-        desc: "한국관광공사 TourAPI와 연동하여 실제 운영 중인 관광지, 맛집, 숙소 데이터로 일정을 구성합니다.",
-    },
-    {
-        icon: "📍",
-        title: "카카오맵 경로 시각화",
-        desc: "생성된 일정의 모든 장소를 카카오맵 위에 마커와 경로로 시각화하여 한눈에 파악할 수 있습니다.",
-    },
+  {
+    icon: "🤖",
+    title: "AI 여행 플래너",
+    desc: "OpenAI GPT-4o가 여행 스타일, 날짜, 선호도를 분석해 최적의 맞춤 일정을 자동으로 생성해드립니다.",
+  },
+  {
+    icon: "🗺️",
+    title: "실제 장소 기반 추천",
+    desc: "한국관광공사 TourAPI와 연동하여 실제 운영 중인 관광지, 맛집, 숙소 데이터로 일정을 구성합니다.",
+  },
+  {
+    icon: "📍",
+    title: "카카오맵 경로 시각화",
+    desc: "생성된 일정의 모든 장소를 카카오맵 위에 마커와 경로로 시각화하여 한눈에 파악할 수 있습니다.",
+  },
 ];
 
 const STEPS = [
-    { n: "01", title: "여행 정보 입력", desc: "날짜, 지역, 여행 유형, 이동 수단을 선택하세요." },
-    { n: "02", title: "자유롭게 요청", desc: "원하는 여행 스타일이나 특별한 요청사항을 채팅으로 입력하세요." },
-    { n: "03", title: "AI 일정 생성", desc: "AI가 실제 장소 데이터를 기반으로 날짜별 최적 일정을 만들어드립니다." },
-    { n: "04", title: "지도로 확인", desc: "생성된 일정을 카카오맵에서 경로와 함께 확인하고 바로 여행을 떠나세요!" },
+  { n: "01", title: "여행 정보 입력", desc: "날짜, 지역, 여행 유형, 이동 수단을 선택하세요." },
+  { n: "02", title: "자유롭게 요청", desc: "원하는 여행 스타일이나 특별한 요청사항을 채팅으로 입력하세요." },
+  { n: "03", title: "AI 일정 생성", desc: "AI가 실제 장소 데이터를 기반으로 날짜별 최적 일정을 만들어드립니다." },
+  { n: "04", title: "지도로 확인", desc: "생성된 일정을 카카오맵에서 경로와 함께 확인하고 바로 여행을 떠나세요!" },
 ];
 
 const LandingPage: React.FC = () => {
-    const navigate = useNavigate();
-    const goChat = () => navigate("/chat");
+  const navigate = useNavigate();
+  const goChat = () => navigate("/plan");
 
-    const scrollTo = (id: string) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    };
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
-    return (
-        <Page>
-            {/* 네비바 */}
-            <Nav>
-                <NavLogo onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-                    <NavLogoIcon>🗺️</NavLogoIcon>
-                    <NavLogoText>Plan<span>My</span>Trip</NavLogoText>
-                </NavLogo>
-                <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
-                    <span
-                        style={{ fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 500 }}
-                        onClick={() => scrollTo("features")}
-                    >
-                        서비스 소개
-                    </span>
-                    <span
-                        style={{ fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 500 }}
-                        onClick={() => scrollTo("how-to")}
-                    >
-                        사용 방법
-                    </span>
-                    <NavCta onClick={goChat}>지금 시작하기</NavCta>
-                </div>
-            </Nav>
+  return (
+    <Page>
+      {/* 네비바 */}
+      <Nav>
+        <NavLogo onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <NavLogoIcon>🗺️</NavLogoIcon>
+          <NavLogoText>Plan<span>My</span>Trip</NavLogoText>
+        </NavLogo>
+        <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+          <span
+            style={{ fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 500 }}
+            onClick={() => scrollTo("features")}
+          >
+            서비스 소개
+          </span>
+          <span
+            style={{ fontSize: 14, color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 500 }}
+            onClick={() => scrollTo("how-to")}
+          >
+            사용 방법
+          </span>
+          <NavCta onClick={goChat}>지금 시작하기</NavCta>
+        </div>
+      </Nav>
 
-            {/* 히어로 */}
-            <Hero>
-                <HeroBg />
-                <HeroEmoji>✈️</HeroEmoji>
-                <HeroBadge>✦ AI Travel Planner ✦</HeroBadge>
-                <HeroTitle>
-                    여행 계획,<br />
-                    <span className="highlight">AI가 다 해드릴게요</span>
-                </HeroTitle>
-                <HeroSub>
-                    날짜와 지역만 알려주세요.<br />
-                    실제 장소 데이터를 기반으로 최적의 여행 일정을 만들어드립니다.
-                </HeroSub>
-                <HeroButtons>
-                    <PrimaryBtn onClick={goChat}>✨ 무료로 시작하기</PrimaryBtn>
-                    <SecondaryBtn onClick={() => scrollTo("how-to")}>사용 방법 보기</SecondaryBtn>
-                </HeroButtons>
-            </Hero>
+      {/* 히어로 */}
+      <Hero>
+        <HeroBg />
+        <HeroEmoji>✈️</HeroEmoji>
+        <HeroBadge>✦ AI Travel Planner ✦</HeroBadge>
+        <HeroTitle>
+          여행 계획,<br />
+          <span className="highlight">AI가 다 해드릴게요</span>
+        </HeroTitle>
+        <HeroSub>
+          날짜와 지역만 알려주세요.<br />
+          실제 장소 데이터를 기반으로 최적의 여행 일정을 만들어드립니다.
+        </HeroSub>
+        <HeroButtons>
+          <PrimaryBtn onClick={goChat}>✨ 무료로 시작하기</PrimaryBtn>
+          <SecondaryBtn onClick={() => scrollTo("how-to")}>사용 방법 보기</SecondaryBtn>
+        </HeroButtons>
+      </Hero>
 
-            {/* 서비스 소개 */}
-            <Section $bg="var(--color-bg-secondary)" id="features">
-                <SectionInner>
-                    <SectionBadge>Features</SectionBadge>
-                    <SectionTitle>왜 PlanMyTrip인가요?</SectionTitle>
-                    <SectionSub>
-                        AI와 실제 데이터의 결합으로 더 똑똑하고 정확한 여행 일정을 경험하세요.
-                    </SectionSub>
-                    <CardGrid>
-                        {FEATURES.map((f) => (
-                            <FeatureCard key={f.title}>
-                                <CardIcon>{f.icon}</CardIcon>
-                                <CardTitle>{f.title}</CardTitle>
-                                <CardDesc>{f.desc}</CardDesc>
-                            </FeatureCard>
-                        ))}
-                    </CardGrid>
-                </SectionInner>
-            </Section>
+      {/* 서비스 소개 */}
+      <Section $bg="var(--color-bg-secondary)" id="features">
+        <SectionInner>
+          <SectionBadge>Features</SectionBadge>
+          <SectionTitle>왜 PlanMyTrip인가요?</SectionTitle>
+          <SectionSub>
+            AI와 실제 데이터의 결합으로 더 똑똑하고 정확한 여행 일정을 경험하세요.
+          </SectionSub>
+          <CardGrid>
+            {FEATURES.map((f) => (
+              <FeatureCard key={f.title}>
+                <CardIcon>{f.icon}</CardIcon>
+                <CardTitle>{f.title}</CardTitle>
+                <CardDesc>{f.desc}</CardDesc>
+              </FeatureCard>
+            ))}
+          </CardGrid>
+        </SectionInner>
+      </Section>
 
-            {/* 사용 방법 */}
-            <Section id="how-to">
-                <SectionInner>
-                    <SectionBadge>How to use</SectionBadge>
-                    <SectionTitle>간단한 4단계로 완성</SectionTitle>
-                    <SectionSub>복잡한 여행 계획은 그만, 쉽고 빠르게 여행 일정을 만들어보세요.</SectionSub>
-                    <StepGrid>
-                        {STEPS.map((s) => (
-                            <StepCard key={s.n}>
-                                <StepNumber>{s.n}</StepNumber>
-                                <StepTitle>{s.title}</StepTitle>
-                                <StepDesc>{s.desc}</StepDesc>
-                            </StepCard>
-                        ))}
-                    </StepGrid>
-                </SectionInner>
-            </Section>
+      {/* 사용 방법 */}
+      <Section id="how-to">
+        <SectionInner>
+          <SectionBadge>How to use</SectionBadge>
+          <SectionTitle>간단한 4단계로 완성</SectionTitle>
+          <SectionSub>복잡한 여행 계획은 그만, 쉽고 빠르게 여행 일정을 만들어보세요.</SectionSub>
+          <StepGrid>
+            {STEPS.map((s) => (
+              <StepCard key={s.n}>
+                <StepNumber>{s.n}</StepNumber>
+                <StepTitle>{s.title}</StepTitle>
+                <StepDesc>{s.desc}</StepDesc>
+              </StepCard>
+            ))}
+          </StepGrid>
+        </SectionInner>
+      </Section>
 
-            {/* CTA */}
-            <CtaSection>
-                <CtaTitle>지금 바로 여행 일정을 만들어보세요</CtaTitle>
-                <CtaSub>무료로 사용할 수 있어요. 지금 바로 시작해보세요!</CtaSub>
-                <PrimaryBtn onClick={goChat} style={{ fontSize: 17, padding: "16px 44px" }}>
-                    ✨ 지금 시작하기
-                </PrimaryBtn>
-            </CtaSection>
+      {/* CTA */}
+      <CtaSection>
+        <CtaTitle>지금 바로 여행 일정을 만들어보세요</CtaTitle>
+        <CtaSub>무료로 사용할 수 있어요. 지금 바로 시작해보세요!</CtaSub>
+        <PrimaryBtn onClick={goChat} style={{ fontSize: 17, padding: "16px 44px" }}>
+          ✨ 지금 시작하기
+        </PrimaryBtn>
+      </CtaSection>
 
-            {/* 푸터 */}
-            <Footer>
-                <FooterLogo>Plan<span>My</span>Trip</FooterLogo>
-                <FooterCopy>© 2026 PlanMyTrip. AI 기반 여행 일정 플래너</FooterCopy>
-            </Footer>
-        </Page>
-    );
+      {/* 푸터 */}
+      <Footer>
+        <FooterLogo>Plan<span>My</span>Trip</FooterLogo>
+        <FooterCopy>© 2026 PlanMyTrip. AI 기반 여행 일정 플래너</FooterCopy>
+      </Footer>
+    </Page>
+  );
 };
 
 export default LandingPage;
