@@ -29,7 +29,7 @@ def area_based_list2(
     cat1: Optional[str] = None,
     cat2: Optional[str] = None,
     cat3: Optional[str] = None,
-    arrange: str = "A",
+    arrange: str = "B",
     num_of_rows: int = 30,
     page_no: int = 1,
 ) -> List[PlaceCandidate]:

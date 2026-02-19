@@ -53,6 +53,17 @@ def _date_list(start: str, end: str) -> List[str]:
     return days
 
 
+def _sort_candidates(places: List[PlaceCandidate]) -> List[PlaceCandidate]:
+    """
+    이미지가 있는 장소를 우선으로 정렬.
+    이미 조회순(arrange=B)으로 받아왔으므로 그 순서를 최대한 유지하면서
+    이미지 없는 장소를 뒤로 밀어냄.
+    """
+    with_image = [p for p in places if p.firstimage]
+    without_image = [p for p in places if not p.firstimage]
+    return with_image + without_image
+
+
 def build_plan_from_front(
     *,
     user_input: str,
@@ -74,14 +85,16 @@ def build_plan_from_front(
     else:
         travel_types = [x.strip() for x in str(travel_type or "").split(",") if x.strip()]
 
-    # 후보 장소 payload (모델은 이 중에서만 선택하게)
+    # 이미지 있는 장소 우선 정렬 후 상위 60개 후보 추출
+    sorted_places = _sort_candidates(places)
+
     candidates = []
-    for p in places[:60]:
+    for p in sorted_places[:60]:
         candidates.append(
             {
                 "title": p.title,
                 "address": p.addr1,
-                "image": p.firstimage,
+                "image": p.firstimage,   # 빈 문자열이면 GPT가 낮은 우선순위로 처리
                 "latitude": p.mapy,
                 "longitude": p.mapx,
             }
@@ -129,7 +142,12 @@ def build_plan_from_front(
             "place는 candidates.title 중 하나여야 함",
             "latitude/longitude는 해당 후보의 좌표를 그대로 사용",
             "1박 이상이면 숙소 1개 포함",
-            "일정은 너무 빡빡하지 않게",
+            "일정은 너무 빡빡하지 않게 — 하루 3~4곳 이내",
+            "userInput의 키워드와 분위기를 최우선으로 반영하여 place를 선택할 것",
+            "travelTypes에 맞지 않는 장소는 제외할 것",
+            "image 필드가 비어 있는 candidates는 image가 있는 candidates보다 낮은 우선순위로 선택",
+            "transportation이 '대중교통'이면 이동 거리가 짧고 접근성 좋은 장소 우선 선택",
+            "transportation이 '자가용'이면 드라이브 코스, 외곽 명소도 포함 가능",
         ],
         "date_hint_list": dates,
     }
@@ -146,14 +164,6 @@ def build_plan_from_front(
     content = resp.choices[0].message.content or "{}"
     data = json.loads(content)
 
-    # ✅ 장소명 기반으로 좌표/주소/이미지 보정(모델 실수 방지)
-    place_map = {p.title: p for p in places}
-    for day in data.get("travelSchedule", []):
-        # 날짜 강제 보정(날짜 리스트가 있으면 그걸로)
-        # day 순서대로 date_hint_list 적용
-        # (모델이 2023 같은 거 써도 덮어씀)
-        pass
-
     # 날짜 덮어쓰기(모델이 이상한 연도 쓰는 걸 방지)
     if dates and isinstance(data.get("travelSchedule"), list):
         for i, d in enumerate(data["travelSchedule"]):
@@ -161,6 +171,8 @@ def build_plan_from_front(
                 d["day"] = d.get("day") or f"Day {i+1}"
                 d["date"] = dates[i]
 
+    # 장소명 기반으로 좌표/주소/이미지 보정(모델 실수 방지)
+    place_map = {p.title: p for p in places}
     for d in data.get("travelSchedule", []):
         for plan in d.get("plan", []):
             title = plan.get("place", "")
