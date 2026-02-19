@@ -8,73 +8,74 @@ import { useUserPlanInfoStore } from "../../store/userPlanInfoStore";
 import { getAIResponse } from "../../api/travel";
 
 const InputContainer = styled.div`
-  padding: 20px;
-  background-color: transparent;
+  padding: 12px 20px 20px;
+  background: transparent;
   display: flex;
   justify-content: center;
   width: 100%;
 `;
 
 const TextArea = styled.textarea`
-  padding: 8px 20px;
+  padding: 10px 16px;
   width: 100%;
-  font-size: 16px;
+  font-size: 14px;
   resize: none;
-  background-color: white;
-  color: #111827;
-  letter-spacing: normal;
-  word-spacing: normal;
+  background: transparent;
+  color: var(--color-text-primary);
   max-height: 200px;
   overflow-y: auto;
+  line-height: 1.6;
 
-  &::placeholder {
-    color: #9ca3af;
-  }
+  &::placeholder { color: var(--color-text-muted); }
 `;
 
 const InputWrapper = styled.form`
   width: 100%;
-  max-width: 768px;
+  max-width: 720px;
   display: flex;
-  align-items: center;
-  border-radius: 30px;
-  border: 1px solid #d1d5db;
+  align-items: flex-end;
+  border-radius: 16px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg-secondary);
   overflow: hidden;
-  padding: 8px;
+  padding: 8px 8px 8px 4px;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
 
   &:focus-within {
-    border-color: #b7d37a;
-    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-muted), var(--shadow-card);
   }
 `;
 
 const ActionButton = styled.button<{ $variant?: "primary" | "secondary" }>`
   width: 36px;
   height: 36px;
-  border-radius: 9999px;
+  min-width: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
-  background-color: ${(props) =>
-    props.$variant === "primary" ? "#b7d37a" : "transparent"};
-  color: ${(props) => (props.$variant === "primary" ? "white" : "#6b7280")};
+  transition: all var(--transition-fast);
+  background: ${(props) =>
+    props.$variant === "primary"
+      ? "linear-gradient(135deg, var(--color-accent-bright), var(--color-accent))"
+      : "transparent"};
+  color: ${(props) => (props.$variant === "primary" ? "#fff" : "var(--color-text-muted)")};
+  font-weight: 700;
 
   &:hover {
-    background-color: ${(props) =>
-      props.$variant === "primary" ? "#798E65" : "#f3f4f6"};
+    background: ${(props) =>
+    props.$variant === "primary"
+      ? "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))"
+      : "var(--color-accent-light)"};
+    transform: ${(props) => (props.$variant === "primary" ? "scale(1.05)" : "none")};
   }
 
   &:disabled {
-    opacity: 0.5;
-    background-color: #6b7280;
-    color: white;
+    opacity: 0.35;
     cursor: not-allowed;
-  }
-
-  svg {
-    display: block;
-    margin: auto;
+    transform: none;
   }
 `;
 
@@ -82,25 +83,21 @@ const ErrorMessage = styled.div`
   position: absolute;
   bottom: -24px;
   left: 16px;
-  color: #ef4444;
+  color: #e53e3e;
   font-size: 12px;
 `;
 
 export const InputArea: React.FC = () => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
   const [error, setError] = useState("");
   const [inputLoading, setInputLoding] = useState(false);
 
-  const { currentChatId, chats, updateChat, addChat, updateMessage } =
-    useChatStore();
+  const { currentChatId, chats, updateChat, addChat, updateMessage } = useChatStore();
   const { userPlanInfo, updateUserPlanInfoField } = useUserPlanInfoStore();
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // form의 기본 제출 동작 막기
-    if (!inputLoading && userPlanInfo.userInput.trim()) {
-      handleSubmit();
-    }
+    e.preventDefault();
+    if (!inputLoading && userPlanInfo.userInput.trim()) handleSubmit();
   };
 
   const handleSubmit = async () => {
@@ -118,18 +115,14 @@ export const InputArea: React.FC = () => {
     let chatId = currentChatId;
     let currentMessages: Message[] = [];
 
-    // 새 채팅 생성 또는 기존 채팅에 사용자 메시지 추가
     if (!chatId) {
       const newChat = {
         id: Date.now().toString(),
-        title:
-          userPlanInfo.userInput.trim().slice(0, 30) +
-          (userPlanInfo.userInput.length > 30 ? "..." : ""),
+        title: userPlanInfo.userInput.trim().slice(0, 30) + (userPlanInfo.userInput.length > 30 ? "..." : ""),
         messages: [userMessage],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-
       addChat(newChat);
       chatId = newChat.id;
       currentMessages = [userMessage];
@@ -137,10 +130,7 @@ export const InputArea: React.FC = () => {
       const currentChat = chats.find((chat) => chat.id === chatId);
       if (currentChat) {
         currentMessages = [...currentChat.messages, userMessage];
-        updateChat(chatId, {
-          messages: currentMessages,
-          updatedAt: new Date(),
-        });
+        updateChat(chatId, { messages: currentMessages, updatedAt: new Date() });
       }
     }
 
@@ -160,12 +150,7 @@ export const InputArea: React.FC = () => {
         isLoading: true,
         isError: false,
       };
-
-      const finalMessages = [...currentMessages, loadingMessage];
-      updateChat(chatId!, {
-        messages: finalMessages,
-        updatedAt: new Date(),
-      });
+      updateChat(chatId!, { messages: [...currentMessages, loadingMessage], updatedAt: new Date() });
 
       const { text, travelSchedule } = await getAIResponse({
         userInput: userPlanInfo.userInput,
@@ -175,49 +160,31 @@ export const InputArea: React.FC = () => {
         transportation: userPlanInfo.transportation,
       });
 
-      updateMessage(chatId!, loadingMessageId, {
-        message: text,
-        content: travelSchedule,
-        isLoading: false,
-        isError: false,
-      });
-
+      updateMessage(chatId!, loadingMessageId, { message: text, content: travelSchedule, isLoading: false, isError: false });
       setInputLoding(false);
-    } catch (error) {
+    } catch {
       setInputLoding(false);
-      updateMessage(chatId!, loadingMessageId, {
-        message: "AI 응답 중 오류가 발생했습니다. 다시 시도해주세요",
-        content: [],
-        isLoading: false,
-        isError: true,
-      });
+      updateMessage(chatId!, loadingMessageId, { message: "AI 응답 중 오류가 발생했습니다. 다시 시도해주세요", content: [], isLoading: false, isError: true });
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (!inputLoading && userPlanInfo.userInput.trim()) {
-        handleSubmit();
-      }
+      if (!inputLoading && userPlanInfo.userInput.trim()) handleSubmit();
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateUserPlanInfoField("userInput", e.target.value);
-
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height =
-        textAreaRef.current.scrollHeight + "px";
+      textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
     }
   };
 
   useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = "auto";
-    }
+    if (textAreaRef.current) textAreaRef.current.style.height = "auto";
   }, []);
 
   return (
@@ -232,15 +199,9 @@ export const InputArea: React.FC = () => {
           rows={1}
           disabled={inputLoading}
         />
-
-        <ActionButton
-          $variant="primary"
-          type="submit"
-          disabled={!userPlanInfo.userInput.trim() || inputLoading}
-        >
-          <SendIcon size={18} />
+        <ActionButton $variant="primary" type="submit" disabled={!userPlanInfo.userInput.trim() || inputLoading}>
+          <SendIcon size={16} />
         </ActionButton>
-
         {error && <ErrorMessage>{error}</ErrorMessage>}
       </InputWrapper>
     </InputContainer>

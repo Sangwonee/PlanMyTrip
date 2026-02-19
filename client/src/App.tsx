@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GlobalStyle } from "./styles/GlobalStyles";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { ChatArea } from "./components/Chat/ChatArea";
@@ -14,6 +15,7 @@ import {
 import DaysMap from "./components/map/DaysMap";
 import { SplitView } from "./components/SplitView/SplitView";
 import { useSplitViewStore } from "./store/splitViewStore";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -54,7 +56,13 @@ function ChatApp() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ChatApp />
+      <BrowserRouter>
+        <GlobalStyle />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/chat" element={<ChatApp />} />
+        </Routes>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }

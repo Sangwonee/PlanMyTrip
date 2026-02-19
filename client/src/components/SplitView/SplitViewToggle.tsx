@@ -8,27 +8,28 @@ const ToggleButton = styled.button`
   position: fixed;
   top: 20px;
   right: 20px;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  border: 1.5px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
   z-index: 1001;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text-secondary);
 
   &:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+    color: var(--color-accent-dark);
+    box-shadow: var(--shadow-hover);
   }
 
-  &:active {
-    transform: scale(0.95);
-  }
+  &:active { transform: scale(0.93); }
 `;
 
 export const SplitViewToggle: React.FC = () => {
@@ -38,10 +39,7 @@ export const SplitViewToggle: React.FC = () => {
   return (
     <>
       {!showSplitView && travelSchedule.length > 0 && (
-        <ToggleButton
-          onClick={toggleSplitView}
-          title={showSplitView ? "스플릿 뷰 닫기" : "스플릿 뷰 열기"}
-        >
+        <ToggleButton onClick={toggleSplitView} title="지도 보기">
           <SplitViewIcon size={18} />
         </ToggleButton>
       )}

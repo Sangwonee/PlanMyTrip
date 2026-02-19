@@ -5,6 +5,7 @@ export const AppContainer = styled.div`
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background: var(--color-bg);
 `;
 
 export const SidebarWrapper = styled.div<{ $isHidden?: boolean }>`
@@ -25,6 +26,7 @@ export const ChatContainer = styled.div<{ $hasSplitView?: boolean }>`
   margin-left: ${(props) => (props.$hasSplitView ? "0" : "260px")};
   width: ${(props) => (props.$hasSplitView ? "50%" : "auto")};
   transition: all 0.3s ease;
+  background: var(--color-bg);
 `;
 
 export const ChatContent = styled.div`
@@ -34,70 +36,34 @@ export const ChatContent = styled.div`
   min-height: 0;
   overflow-y: auto;
 
-  /* 스크롤바 스타일링 */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-  }
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
 `;
 
 export const SplitContainer = styled.div`
   width: 50%;
   height: 100vh;
-  background-color: #fafafa;
-  border-left: 1px solid #e5e7eb;
+  background: var(--color-bg-secondary);
+  border-left: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
 
-  /* 스크롤바 스타일링 */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-  }
-
   @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
   }
 `;
 
 export const SplitHeader = styled.div`
   padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: white;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
   font-weight: 600;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-text-primary);
   flex-shrink: 0;
 `;
 
@@ -106,7 +72,7 @@ export const SplitContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 14px;
   text-align: center;
 `;

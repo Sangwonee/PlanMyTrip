@@ -15,8 +15,12 @@ export const WelcomeScreen: React.FC = () => {
   return (
     <S.WelcomeContainer>
       <S.WelcomeTitle>
-        <p>여행이 필요한 당신을 위한 AI플래너</p>
+        <p className="subtitle">✦ AI Travel Planner ✦</p>
         <span className="title">Plan My Trip</span>
+        <p className="description">
+          여행지, 날짜, 스타일을 알려주시면<br />
+          AI가 최적의 여행 일정을 만들어드려요
+        </p>
       </S.WelcomeTitle>
 
       <UserInfoForm />
