@@ -7,6 +7,8 @@ interface GetMessageArgumentType {
   region: string;
   travelType: string;
   transportation: string;
+  companions: string;
+  pace: string;
 }
 
 export const getAIResponse = async (

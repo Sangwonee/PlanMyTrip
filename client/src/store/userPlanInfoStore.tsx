@@ -11,6 +11,8 @@ export const useUserPlanInfoStore = create<UserPlanInfoStoreType>()((set) => ({
     startDate: "",
     endDate: "",
     transportation: "자가용",
+    companions: "친구들",
+    pace: "보통",
     travelType: ["관광"],
   },
 
@@ -28,6 +30,8 @@ export const useUserPlanInfoStore = create<UserPlanInfoStoreType>()((set) => ({
         startDate: "",
         endDate: "",
         transportation: "자가용",
+        companions: "친구들",
+        pace: "보통",
         travelType: ["관광"],
       },
     }));

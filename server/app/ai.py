@@ -71,6 +71,8 @@ def build_plan_from_front(
     region: str,
     travel_type: Union[str, List[str]],
     transportation: str,
+    companions: str = "",
+    pace: str = "",
     places: List[PlaceCandidate],
 ) -> ResponseDto:
     if not os.getenv("OPENAI_API_KEY"):
@@ -130,11 +132,32 @@ def build_plan_from_front(
         ],
     }
 
+    # companions/pace 별 추가 규칙 생성
+    companion_rules = {
+        "혼자": "혼자 여행에 적합한 장소 선택 — 혼밥 가능 식당, 산책로, 문화공간, 혼자 즐기기 좋은 명소 우선",
+        "커플": "커플 여행에 적합한 장소 선택 — 야경 명소, 감성 카페, 로맨틱한 분위기의 소규모 장소 우선",
+        "가족": "가족(어린이 동반) 여행에 적합한 장소 선택 — 어린이 친화 명소, 체험 프로그램, 넓고 안전한 공간 우선",
+        "친구들": "친구들과의 여행에 적합한 장소 선택 — 활동적이고 재미있는 명소, 단체 식사 가능한 식당 우선",
+    }
+    pace_rules = {
+        "여유롭게": "하루 2~3곳만 방문하고 각 장소에 충분한 시간을 배분할 것",
+        "보통": "하루 3~4곳을 균형 있게 배분할 것",
+        "알차게": "하루 4~5곳까지 방문하되 이동 시간을 고려해 동선을 최적화할 것",
+    }
+
+    extra_rules = []
+    if companions and companions in companion_rules:
+        extra_rules.append(companion_rules[companions])
+    if pace and pace in pace_rules:
+        extra_rules.append(pace_rules[pace])
+
     user_payload = {
         "region": region,
         "date_range": {"start": start_date, "end": end_date},
         "travelTypes": travel_types,
         "transportation": transportation,
+        "companions": companions,
+        "pace": pace,
         "userInput": user_input,
         "candidates": candidates,
         "response_schema": response_schema,
@@ -142,13 +165,12 @@ def build_plan_from_front(
             "place는 candidates.title 중 하나여야 함",
             "latitude/longitude는 해당 후보의 좌표를 그대로 사용",
             "1박 이상이면 숙소 1개 포함",
-            "일정은 너무 빡빡하지 않게 — 하루 3~4곳 이내",
             "userInput의 키워드와 분위기를 최우선으로 반영하여 place를 선택할 것",
             "travelTypes에 맞지 않는 장소는 제외할 것",
             "image 필드가 비어 있는 candidates는 image가 있는 candidates보다 낮은 우선순위로 선택",
             "transportation이 '대중교통'이면 이동 거리가 짧고 접근성 좋은 장소 우선 선택",
             "transportation이 '자가용'이면 드라이브 코스, 외곽 명소도 포함 가능",
-        ],
+        ] + extra_rules,
         "date_hint_list": dates,
     }
 

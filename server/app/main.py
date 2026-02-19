@@ -98,6 +98,8 @@ def plan(req: FrontPlanRequest):
             region=req.region,
             travel_type=req.travelType,
             transportation=req.transportation,
+            companions=req.companions,
+            pace=req.pace,
             places=places,
         )
 

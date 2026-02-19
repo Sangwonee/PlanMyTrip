@@ -4,6 +4,8 @@ export interface UserPlanInfoType {
   startDate: string;
   endDate: string;
   transportation: string;
+  companions: string;  // "혼자" | "커플" | "가족" | "친구들"
+  pace: string;        // "여유롭게" | "보통" | "알차게"
   userInput: string;
 }
 
