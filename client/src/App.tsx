@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GlobalStyle } from "./styles/GlobalStyles";
@@ -14,13 +15,25 @@ import {
 import DaysMap from "./components/map/DaysMap";
 import { SplitView } from "./components/SplitView/SplitView";
 import { useSplitViewStore } from "./store/splitViewStore";
+import { useTravelScheduleStore } from "./store/travelScheduleStore";
+import { useUserPlanInfoStore } from "./store/userPlanInfoStore";
+import { useChatStore } from "./store/chatStore";
 import LandingPage from "./pages/LandingPage";
 import PlanFormPage from "./pages/PlanFormPage";
 
 const queryClient = new QueryClient();
 
 function ChatApp() {
-  const { showSplitView } = useSplitViewStore();
+  const { showSplitView, setSplitViewOpen } = useSplitViewStore();
+  const { deleteTravelSchedule } = useTravelScheduleStore();
+  const { updateUserPlanInfoField } = useUserPlanInfoStore();
+  const { currentChatId } = useChatStore();
+
+  useEffect(() => {
+    deleteTravelSchedule();
+    setSplitViewOpen(false);
+    updateUserPlanInfoField("userInput", "");
+  }, [currentChatId, deleteTravelSchedule, setSplitViewOpen, updateUserPlanInfoField]);
 
   return (
     <>

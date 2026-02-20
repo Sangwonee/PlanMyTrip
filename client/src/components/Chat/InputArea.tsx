@@ -158,6 +158,8 @@ export const InputArea: React.FC = () => {
         region: userPlanInfo.region,
         travelType: userPlanInfo.travelType.join(","),
         transportation: userPlanInfo.transportation,
+        companions: userPlanInfo.companions,
+        pace: userPlanInfo.pace,
       });
 
       updateMessage(chatId!, loadingMessageId, { message: text, content: travelSchedule, isLoading: false, isError: false });

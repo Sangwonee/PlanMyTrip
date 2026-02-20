@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled, { keyframes, css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useUserPlanInfoStore } from "../store/userPlanInfoStore";
@@ -295,11 +295,15 @@ const travelTypeOptions = ["관광", "문화시설", "축제 / 공연 / 행사",
 /* ── 컴포넌트 ────────────────────── */
 const PlanFormPage: React.FC = () => {
   const navigate = useNavigate();
-  const { userPlanInfo, updateUserPlanInfoField } = useUserPlanInfoStore();
+  const { userPlanInfo, updateUserPlanInfoField, resetUserPlanInfo } = useUserPlanInfoStore();
   const { addChat, updateMessage } = useChatStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    resetUserPlanInfo();
+  }, [resetUserPlanInfo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -328,6 +332,7 @@ const PlanFormPage: React.FC = () => {
       messages: [userMessage, loadingMessage],
       createdAt: new Date(), updatedAt: new Date(),
     });
+    updateUserPlanInfoField("userInput", "");
     navigate("/chat");
 
     try {
