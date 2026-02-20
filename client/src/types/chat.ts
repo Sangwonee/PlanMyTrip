@@ -22,6 +22,7 @@ export interface ChatStore {
   chats: Chat[];
   currentChatId: string | null;
   sidebarOpen: boolean;
+  panelMode: "chat" | "editor";
 
   resetChat: () => void;
   addChat: (chat: Chat) => void;
@@ -33,6 +34,7 @@ export interface ChatStore {
   ) => void;
   deleteChat: (chatId: string) => void;
   setCurrentChat: (chatId: string | null) => void;
+  setPanelMode: (mode: "chat" | "editor") => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
 }

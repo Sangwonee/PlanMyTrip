@@ -1,19 +1,31 @@
+import type React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useUserPlanInfoStore } from "../../store/userPlanInfoStore";
+import { useTravelScheduleStore } from "../../store/travelScheduleStore";
+import { useChatStore } from "../../store/chatStore";
+import { ChatHistory } from "./ChatHistory";
 
 const MenuContainer = styled.div`
-  padding: 12px 10px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+`;
+
+const TopActions = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-  flex: 1;
-  overflow-y: auto;
+  margin-bottom: 8px;
 `;
 
-const MenuItem = styled.button`
+const MenuItem = styled.button<{ $active?: boolean }>`
   width: 100%;
   padding: 10px 12px;
-  background: transparent;
-  color: var(--color-text-secondary);
+  background: ${({ $active }) => ($active ? "var(--color-accent-light)" : "transparent")};
+  color: ${({ $active }) => ($active ? "var(--color-accent-dark)" : "var(--color-text-secondary)")};
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -22,7 +34,7 @@ const MenuItem = styled.button`
   font-weight: 500;
   text-align: left;
   transition: all var(--transition-fast);
-  border: 1px solid transparent;
+  border: 1px solid ${({ $active }) => ($active ? "var(--color-border)" : "transparent")};
 
   &:hover {
     background: var(--color-accent-light);
@@ -53,56 +65,46 @@ const NewPlanBtn = styled.button`
   }
 `;
 
-const SectionTitle = styled.div`
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  padding: 10px 12px 4px;
+const HistorySection = styled.div`
+  flex: 1;
+  min-height: 0;
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
 `;
 
-import type React from "react";
-import { useChatStore } from "../../store/chatStore";
-import { HomeIcon } from "../Icons";
-import { useUserPlanInfoStore } from "../../store/userPlanInfoStore";
-import { useTravelScheduleStore } from "../../store/travelScheduleStore";
-import { useNavigate } from "react-router-dom";
-
 export const SidebarMenu: React.FC = () => {
-  const { setCurrentChat, chats, resetChat } = useChatStore();
+  const { panelMode, setPanelMode } = useChatStore();
   const { resetUserPlanInfo } = useUserPlanInfoStore();
   const { deleteTravelSchedule } = useTravelScheduleStore();
   const navigate = useNavigate();
 
-  const handleHome = () => {
-    setCurrentChat(null);
-    resetChat();
+  const handleNewPlan = () => {
     resetUserPlanInfo();
     deleteTravelSchedule();
-    navigate("/");
+    setPanelMode("chat");
+    navigate("/plan");
   };
 
-  const handleNewPlan = () => {
-    navigate("/plan");
+  const handleToggleEditor = () => {
+    setPanelMode(panelMode === "editor" ? "chat" : "editor");
+    navigate("/chat");
   };
 
   return (
     <MenuContainer>
-      <NewPlanBtn onClick={handleNewPlan}>
-        ✦ 새 여행 계획
-      </NewPlanBtn>
+      <TopActions>
+        <NewPlanBtn onClick={handleNewPlan}>
+          ✦ 새 여행 계획
+        </NewPlanBtn>
 
-      <div style={{ margin: "4px 0" }} />
+        <MenuItem onClick={handleToggleEditor} $active={panelMode === "editor"}>
+          {panelMode === "editor" ? "채팅으로 돌아가기" : "일정 편집 카드 열기"}
+        </MenuItem>
+      </TopActions>
 
-      <MenuItem onClick={handleHome}>
-        <HomeIcon size={16} />
-        홈으로
-      </MenuItem>
-
-      {chats.length > 0 && (
-        <SectionTitle>최근 여행</SectionTitle>
-      )}
+      <HistorySection>
+        <ChatHistory />
+      </HistorySection>
     </MenuContainer>
   );
 };

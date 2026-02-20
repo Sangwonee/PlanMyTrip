@@ -1,70 +1,73 @@
-"use client"
+"use client";
 
-import type React from "react"
-import styled from "styled-components"
-import type { Chat } from "../../types/chat"
-import { useChatStore } from "../../store/chatStore"
-import { TrashIcon } from "../Icons"
+import type React from "react";
+import styled from "styled-components";
+import type { Chat } from "../../types/chat";
+import { useChatStore } from "../../store/chatStore";
+import { TrashIcon } from "../Icons";
 
 const ItemContainer = styled.div<{ $isActive: boolean }>`
-  padding: 8px 12px;
-  margin-bottom: 2px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: ${(props) => (props.$isActive ? "#f3f4f6" : "transparent")};
-  transition: background-color 0.2s;
+  background: ${({ $isActive }) => ($isActive ? "var(--color-accent-light)" : "transparent")};
+  border: 1px solid ${({ $isActive }) => ($isActive ? "var(--color-border)" : "transparent")};
+  transition: all var(--transition-fast);
 
   &:hover {
-    background-color: #f9fafb;
+    background: var(--color-accent-light);
+    border-color: var(--color-border);
   }
-`
+`;
 
 const ChatTitle = styled.div`
-  font-size: 14px;
-  color: #374151;
+  font-size: 13px;
+  color: var(--color-text-secondary);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 400;
-`
+  font-weight: 500;
+`;
 
 const DeleteButton = styled.button`
   padding: 4px;
-  color: #9ca3af;
-  border-radius: 4px;
+  color: var(--color-text-muted);
+  border-radius: 6px;
   opacity: 0;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   ${ItemContainer}:hover & {
     opacity: 1;
   }
 
   &:hover {
-    background-color: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
   }
-`
+`;
 
 interface ChatItemProps {
-  chat: Chat
+  chat: Chat;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
-  const { currentChatId, setCurrentChat, deleteChat } = useChatStore()
-  const isActive = currentChatId === chat.id
+  const { currentChatId, setCurrentChat, deleteChat, setPanelMode } = useChatStore();
+  const isActive = currentChatId === chat.id;
 
   const handleClick = () => {
-    setCurrentChat(chat.id)
-  }
+    setCurrentChat(chat.id);
+    setPanelMode("chat");
+  };
 
   const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    deleteChat(chat.id)
-  }
+    e.stopPropagation();
+    deleteChat(chat.id);
+  };
 
   return (
     <ItemContainer $isActive={isActive} onClick={handleClick}>
@@ -73,5 +76,5 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
         <TrashIcon size={14} />
       </DeleteButton>
     </ItemContainer>
-  )
-}
+  );
+};

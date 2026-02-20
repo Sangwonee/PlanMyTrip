@@ -47,8 +47,8 @@ const SplitContent = styled.div`
   flex: 1;
   overflow-y: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   color: #9ca3af;
   font-size: 14px;
   text-align: center;

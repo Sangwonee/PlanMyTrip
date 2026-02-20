@@ -19,7 +19,10 @@ const PolylineAndMarkers: React.FC<PolylineAndMarkersPropsType> = ({
   const validPoints = places
     .filter(
       ({ longitude, latitude }) =>
-        !isNaN(longitude ?? 0) && !isNaN(latitude ?? 0)
+        !isNaN(longitude ?? 0) &&
+        !isNaN(latitude ?? 0) &&
+        (longitude ?? 0) !== 0 &&
+        (latitude ?? 0) !== 0
     )
     .map(({ longitude, latitude }) => ({
       lng: longitude ?? 0,
@@ -47,7 +50,14 @@ const PolylineAndMarkers: React.FC<PolylineAndMarkersPropsType> = ({
           image,
         } = item;
 
-        if (isNaN(longitude ?? 0) || isNaN(latitude ?? 0)) return null;
+        if (
+          isNaN(longitude ?? 0) ||
+          isNaN(latitude ?? 0) ||
+          (longitude ?? 0) === 0 ||
+          (latitude ?? 0) === 0
+        ) {
+          return null;
+        }
 
         const position = { lng: longitude!, lat: latitude! };
         const key = `${keyPrefix}-${index}-${place}-${longitude}-${latitude}`;

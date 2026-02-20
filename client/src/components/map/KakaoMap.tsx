@@ -38,7 +38,12 @@ const KakaoMap: React.FC<KakaoMapProps> = ({ placeList, day }) => {
 
     const addToBounds = (places: PlaceDataType[]) => {
       places.forEach(({ longitude, latitude }) => {
-        if (!isNaN(longitude ?? 0) && !isNaN(latitude ?? 0)) {
+        if (
+          !isNaN(longitude ?? 0) &&
+          !isNaN(latitude ?? 0) &&
+          (longitude ?? 0) !== 0 &&
+          (latitude ?? 0) !== 0
+        ) {
           bounds.extend(
             new window.kakao.maps.LatLng(latitude ?? 0, longitude ?? 0)
           );

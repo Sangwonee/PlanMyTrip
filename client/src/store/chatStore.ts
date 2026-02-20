@@ -8,11 +8,13 @@ export const useChatStore = create<ChatStore>()(
       chats: [],
       currentChatId: null,
       sidebarOpen: true,
+      panelMode: "chat",
 
       addChat: (chat: Chat) => {
         set((state) => ({
           chats: [chat, ...state.chats],
           currentChatId: chat.id,
+          panelMode: "chat",
         }));
       },
 
@@ -20,6 +22,7 @@ export const useChatStore = create<ChatStore>()(
         set(() => ({
           chats: [],
           currentChatId: null,
+          panelMode: "chat",
         }));
       },
 
@@ -69,6 +72,10 @@ export const useChatStore = create<ChatStore>()(
 
       setCurrentChat: (chatId: string | null) => {
         set({ currentChatId: chatId });
+      },
+
+      setPanelMode: (mode: "chat" | "editor") => {
+        set({ panelMode: mode });
       },
 
       toggleSidebar: () => {

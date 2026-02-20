@@ -35,32 +35,34 @@
 
 :root {
   /* 배경 */
-  --color-bg: #f5f9f2;
+  --color-bg: #f7faf4;
   --color-bg-secondary: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-hover: #f0f7ea;
+  --color-surface-hover: #eef6e8;
 
-  /* 포인트 컬러 (자연 그린) */
-  --color-accent: #4a9c5d;
-  --color-accent-bright: #6ab870;
-  --color-accent-dark: #357a45;
-  --color-accent-muted: rgba(74, 156, 93, 0.1);
-  --color-accent-light: #e8f5e9;
+  /* 포인트 컬러 (브랜드 그린) */
+  --color-accent: #4f9e4f;
+  --color-accent-bright: #71bf67;
+  --color-accent-dark: #2f7441;
+  --color-accent-muted: rgba(79, 158, 79, 0.14);
+  --color-accent-light: #eaf6e8;
+  --color-brand-warm: #f0ab36;
+  --color-brand-warm-soft: #fff4dd;
 
   /* 텍스트 */
-  --color-text-primary: #1a2e1a;
-  --color-text-secondary: #4a6255;
-  --color-text-muted: #8faa8f;
+  --color-text-primary: #1f2f22;
+  --color-text-secondary: #4f6456;
+  --color-text-muted: #8da392;
 
   /* 보더 */
-  --color-border: rgba(74, 156, 93, 0.18);
-  --color-border-hover: rgba(74, 156, 93, 0.4);
+  --color-border: rgba(79, 158, 79, 0.2);
+  --color-border-hover: rgba(79, 158, 79, 0.45);
 
   /* 그림자 */
-  --shadow-sm: 0 1px 4px rgba(74, 156, 93, 0.08);
-  --shadow-card: 0 4px 20px rgba(74, 156, 93, 0.1);
-  --shadow-hover: 0 8px 32px rgba(74, 156, 93, 0.18);
-  --shadow-glow: 0 0 24px rgba(74, 156, 93, 0.25);
+  --shadow-sm: 0 1px 4px rgba(79, 158, 79, 0.1);
+  --shadow-card: 0 4px 20px rgba(79, 158, 79, 0.12);
+  --shadow-hover: 0 8px 32px rgba(79, 158, 79, 0.2);
+  --shadow-glow: 0 0 24px rgba(79, 158, 79, 0.26);
 
   /* 타이밍 */
   --transition-fast: 0.15s ease;

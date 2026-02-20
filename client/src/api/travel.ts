@@ -1,4 +1,4 @@
-import type { ResponseDataType } from "../types/api";
+import type { PlanDataType, ResponseDataType } from "../types/api";
 import api from "./api";
 
 interface GetMessageArgumentType {
@@ -9,6 +9,7 @@ interface GetMessageArgumentType {
   transportation: string;
   companions: string;
   pace: string;
+  currentSchedule?: PlanDataType[];
 }
 
 export const getAIResponse = async (

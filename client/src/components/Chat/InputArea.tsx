@@ -152,6 +152,10 @@ export const InputArea: React.FC = () => {
       };
       updateChat(chatId!, { messages: [...currentMessages, loadingMessage], updatedAt: new Date() });
 
+      const latestAssistantSchedule = [...currentMessages]
+        .reverse()
+        .find((msg) => msg.role === "assistant" && msg.content.length > 0)?.content ?? [];
+
       const { text, travelSchedule } = await getAIResponse({
         userInput: userPlanInfo.userInput,
         date: `${userPlanInfo.startDate} ~ ${userPlanInfo.endDate}`,
@@ -160,6 +164,7 @@ export const InputArea: React.FC = () => {
         transportation: userPlanInfo.transportation,
         companions: userPlanInfo.companions,
         pace: userPlanInfo.pace,
+        currentSchedule: latestAssistantSchedule,
       });
 
       updateMessage(chatId!, loadingMessageId, { message: text, content: travelSchedule, isLoading: false, isError: false });
