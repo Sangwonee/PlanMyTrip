@@ -49,11 +49,10 @@ const BackBtn = styled.button`
   &:hover { color: var(--color-accent-dark); background: var(--color-accent-light); }
 `;
 
-const LogoText = styled.span`
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  span { color: var(--color-accent); }
+const LogoImage = styled.img`
+  width: 128px;
+  height: auto;
+  display: block;
 `;
 
 const Body = styled.main`
@@ -358,7 +357,7 @@ const PlanFormPage: React.FC = () => {
     <Page>
       <TopBar>
         <BackBtn onClick={() => navigate("/")}>← 홈으로</BackBtn>
-        <LogoText>Plan<span>My</span>Trip</LogoText>
+        <LogoImage src="/brand/PLANDL_horizontal_logo.png" alt="PLANDL 로고" />
         <div style={{ width: 80 }} />
       </TopBar>
 

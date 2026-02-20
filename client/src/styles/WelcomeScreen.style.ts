@@ -53,6 +53,12 @@ export const WelcomeTitle = styled.div`
     background-clip: text;
   }
 
+  .logo {
+    width: 220px;
+    height: auto;
+    display: block;
+  }
+
   .description {
     font-size: 15px;
     color: var(--color-text-secondary);

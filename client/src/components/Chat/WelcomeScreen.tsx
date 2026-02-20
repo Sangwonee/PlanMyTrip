@@ -16,7 +16,7 @@ export const WelcomeScreen: React.FC = () => {
     <S.WelcomeContainer>
       <S.WelcomeTitle>
         <p className="subtitle">✦ AI Travel Planner ✦</p>
-        <span className="title">Plan My Trip</span>
+        <img className="logo" src="/brand/PLANDL_horizontal_logo.png" alt="PLANDL 로고" />
         <p className="description">
           여행지, 날짜, 스타일을 알려주시면<br />
           AI가 최적의 여행 일정을 만들어드려요

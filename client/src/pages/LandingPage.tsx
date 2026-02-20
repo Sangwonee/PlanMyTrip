@@ -41,28 +41,13 @@ const Nav = styled.nav`
 const NavLogo = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
 `;
 
-const NavLogoIcon = styled.div`
-  width: 34px;
-  height: 34px;
-  background: linear-gradient(135deg, var(--color-accent-bright), var(--color-accent));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  box-shadow: var(--shadow-card);
-`;
-
-const NavLogoText = styled.span`
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
-  span { color: var(--color-accent); }
+const NavLogoImage = styled.img`
+  width: 158px;
+  height: auto;
+  display: block;
 `;
 
 const NavCta = styled.button`
@@ -399,11 +384,10 @@ const Footer = styled.footer`
   gap: 12px;
 `;
 
-const FooterLogo = styled.div`
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-secondary);
-  span { color: var(--color-accent); }
+const FooterLogo = styled.img`
+  width: 132px;
+  height: auto;
+  display: block;
 `;
 
 const FooterCopy = styled.p`
@@ -450,8 +434,7 @@ const LandingPage: React.FC = () => {
       {/* 네비바 */}
       <Nav>
         <NavLogo onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <NavLogoIcon>🗺️</NavLogoIcon>
-          <NavLogoText>Plan<span>My</span>Trip</NavLogoText>
+          <NavLogoImage src="/brand/PLANDL_horizontal_logo.png" alt="PLANDL 로고" />
         </NavLogo>
         <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
           <span
@@ -493,7 +476,7 @@ const LandingPage: React.FC = () => {
       <Section $bg="var(--color-bg-secondary)" id="features">
         <SectionInner>
           <SectionBadge>Features</SectionBadge>
-          <SectionTitle>왜 PlanMyTrip인가요?</SectionTitle>
+          <SectionTitle>왜 PLANDL인가요?</SectionTitle>
           <SectionSub>
             AI와 실제 데이터의 결합으로 더 똑똑하고 정확한 여행 일정을 경험하세요.
           </SectionSub>
@@ -538,8 +521,8 @@ const LandingPage: React.FC = () => {
 
       {/* 푸터 */}
       <Footer>
-        <FooterLogo>Plan<span>My</span>Trip</FooterLogo>
-        <FooterCopy>© 2026 PlanMyTrip. AI 기반 여행 일정 플래너</FooterCopy>
+        <FooterLogo src="/brand/PLANDL_horizontal_logo.png" alt="PLANDL 로고" />
+        <FooterCopy>© 2026 PLANDL. AI 기반 여행 일정 플래너</FooterCopy>
       </Footer>
     </Page>
   );

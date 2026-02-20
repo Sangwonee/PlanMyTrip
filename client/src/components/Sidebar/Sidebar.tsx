@@ -21,35 +21,16 @@ const LogoArea = styled.div`
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
   transition: opacity var(--transition-fast);
 
   &:hover { opacity: 0.8; }
 `;
 
-const LogoIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--color-accent-bright), var(--color-accent));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-card);
-`;
-
-const LogoText = styled.span`
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
-
-  span {
-    color: var(--color-accent);
-  }
+const LogoImage = styled.img`
+  width: 152px;
+  height: auto;
+  display: block;
 `;
 
 export const Sidebar: React.FC = () => {
@@ -58,8 +39,7 @@ export const Sidebar: React.FC = () => {
   return (
     <SidebarContainer>
       <LogoArea onClick={() => navigate("/")}>
-        <LogoIcon>🗺️</LogoIcon>
-        <LogoText>Plan<span>My</span>Trip</LogoText>
+        <LogoImage src="/brand/PLANDL_horizontal_logo.png" alt="PLANDL 로고" />
       </LogoArea>
       <SidebarMenu />
     </SidebarContainer>
