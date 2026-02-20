@@ -1,11 +1,13 @@
 import os
 import requests
+import logging
 from typing import List, Optional
 
 from app.schemas import PlaceCandidate
 
 BASE_URL = "https://apis.data.go.kr/B551011/KorService2"
 TOURAPI_KEY = os.getenv("TOURAPI_SERVICE_KEY", "")
+logger = logging.getLogger(__name__)
 
 
 def _normalize_items(data) -> List[dict]:
@@ -62,7 +64,17 @@ def area_based_list2(
 
     r = requests.get(url, params=params, timeout=15)
     r.raise_for_status()
-    data = r.json()
+    try:
+        data = r.json()
+    except ValueError:
+        preview = (r.text or "").strip().replace("\n", " ")[:180]
+        logger.warning(
+            "TourAPI JSON parse failed status=%s content-type=%s body=%s",
+            r.status_code,
+            r.headers.get("content-type"),
+            preview,
+        )
+        return []
 
     out: List[PlaceCandidate] = []
     for it in _normalize_items(data):
